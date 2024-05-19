@@ -33,9 +33,9 @@ class Szalloda:
         self.szobak = []
         self.foglalasok = []
 
-    def f_lemondas(self, szobaszam, kezdet):
+    def f_lemondas(self, szobaszam, eleje):
         for i, foglalas in enumerate(self.foglalasok):
-            if foglalas.szobaszam == szobaszam and foglalas.kezdet == kezdet:
+            if foglalas.szobaszam == szobaszam and foglalas.kezdet == eleje:
                 del self.foglalasok[i]
                 return True, "Foglalás lemondva."
         return False, "Nincs ilyen foglalás."
@@ -50,19 +50,19 @@ class Szalloda:
             f"Szobaszám: {szoba.szobaszam}, Típus: {'Egyágyas' if isinstance(szoba, EgyagyasSzoba) else 'Kétágyas'}"
             for szoba in self.szobak)
 
-    def f_hozzadas(self, szobaszam, kezdet, vege):
-        if vege <= kezdet:
-            return None, "A foglalás végének a dátum nem lehet korábbi, mint a foglalás kezdetének a dátumával."
-        if any(f.szobaszam == szobaszam and not (f.vege <= kezdet or f.kezdet >= vege) for f in self.foglalasok):
+    def f_hozzadas(self, szobaszam, eleje, vege):
+        if vege <= eleje:
+            return None, "A foglalás végének a dátuma nem lehet korábbi, mint a foglalás elejének a dátumával."
+        if any(f.szobaszam == szobaszam and not (f.vege <= eleje or f.elje>= vege) for f in self.foglalasok):
             return None, "A szoba már foglalt ebben az időszakban."
-        if kezdet < datetime.now():
-            return None, "A foglalás kezdetének a dátuma nem lehet a múltban."
+        if eleje < datetime.now():
+            return None, "A foglalás elejének a dátuma nem lehet a múltban."
 
         for szoba in self.szobak:
             if szoba.szobaszam == szobaszam:
-                napok = (vege - kezdet).days + 1
+                napok = (vege - eleje).days + 1
                 dij = szoba.f_dij(napok)
-                self.foglalasok.append(Foglalas(szobaszam, kezdet, vege))
+                self.foglalasok.append(Foglalas(szobaszam, eleje, vege))
                 return dij, "Foglalás sikeresen létrehozva, a foglalás ára: {} Ft".format(dij)
 
         return None, "Nem található a szobaszám ."
@@ -71,13 +71,13 @@ class Szalloda:
         if not self.foglalasok:
             return "Nincsenek aktív foglalások."
         return "\n".join(
-            f"Szobaszám: {f.szobaszam}, Kezdet: {f.kezdet.date()}, Vége: {f.vege.date()}" for f in self.foglalasok)
+            f"Szobaszám: {f.szobaszam}, eleje: {f.eleje.date()}, Vége: {f.vege.date()}" for f in self.foglalasok)
 
 
 class Foglalas:
-    def __init__(self, szobaszam, kezdet, vege):
+    def __init__(self, szobaszam, eleje, vege):
         self.szobaszam = szobaszam
-        self.kezdet = kezdet
+        self.eleje = eleje
         self.vege = vege
 
 
@@ -92,15 +92,15 @@ def cli(szalloda):
 
         if valasztas == "1":
             szobaszam = int(input("Adja meg a szobaszámot: "))
-            kezdet = datetime.strptime(input("Adja meg a foglalás kezdetének a dátumát : YYYY-MM-DD: "), "%Y-%m-%d")
+            eleje = datetime.strptime(input("Adja meg a foglalás elejének a dátumát : YYYY-MM-DD: "), "%Y-%m-%d")
             vege = datetime.strptime(input("Adja meg a foglalás végének a dátumát: YYYY-MM-DD: "), "%Y-%m-%d")
-            dij, uzenet = szalloda.f_hozzadas(szobaszam, kezdet, vege)
+            dij, uzenet = szalloda.f_hozzadas(szobaszam, eleje, vege)
             print(uzenet)
 
         elif valasztas == "2":
             szobaszam = int(input("Adja meg a szobaszámot: "))
-            kezdet = datetime.strptime(input("Adja meg a foglalás kezdetének a dátumát: YYYY-MM-DD: "), "%Y-%m-%d")
-            siker, uzenet = szalloda.f_lemondas(szobaszam, kezdet)
+            eleje = datetime.strptime(input("Adja meg a foglalás elejének a dátumát: YYYY-MM-DD: "), "%Y-%m-%d")
+            siker, uzenet = szalloda.f_lemondas(szobaszam, eleje)
             print(uzenet)
 
         elif valasztas == "3":
