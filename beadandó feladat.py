@@ -120,9 +120,12 @@ def cli(szalloda):
 
 # Szálloda és szobák inicializálása
 szalloda = Szalloda("Példa Szálloda")
+szalloda.sz_hozzaadas(EgyagyasSzoba(100))
 szalloda.sz_hozzaadas(EgyagyasSzoba(101))
-szalloda.sz_hozzaadas(KetagyasSzoba(102))
+szalloda.sz_hozzaadas(EgyagyasSzoba(102))
 szalloda.sz_hozzaadas(KetagyasSzoba(103))
+szalloda.sz_hozzaadas(KetagyasSzoba(104))
+szalloda.sz_hozzaadas(KetagyasSzoba(105))
 
 # Foglalások előkészítése
 now = datetime.now()
